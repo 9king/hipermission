@@ -1,10 +1,8 @@
-package com.uguke.code.permission;
+package com.uguke.permission;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.icu.util.Calendar;
 import android.support.annotation.DrawableRes;
-import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;

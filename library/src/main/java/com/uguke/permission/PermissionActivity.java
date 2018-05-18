@@ -1,4 +1,4 @@
-package com.uguke.code.permission;
+package com.uguke.permission;
 
 import android.app.Activity;
 import android.graphics.Color;

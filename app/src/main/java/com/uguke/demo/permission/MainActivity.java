@@ -3,8 +3,8 @@ package com.uguke.demo.permission;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import com.uguke.code.permission.HiPermission;
-import com.uguke.code.permission.Permission;
+import com.uguke.permission.HiPermission;
+import com.uguke.permission.Permission;
 
 import java.util.ArrayList;
 import java.util.List;

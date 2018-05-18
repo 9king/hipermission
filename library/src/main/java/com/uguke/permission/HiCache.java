@@ -1,4 +1,4 @@
-package com.uguke.code.permission;
+package com.uguke.permission;
 
 import java.util.HashMap;
 import java.util.Map;
