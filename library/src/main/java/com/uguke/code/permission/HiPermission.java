@@ -39,22 +39,6 @@ public class HiPermission {
     /** 需要解释的权限回调 **/
     private OnRationaleListener rationaleListener;
 
-    // 初始化Manifest中的权限
-    private static void initPermissions(Context context) {
-        if (manifestPermissions != null)
-            return;
-        PackageInfo pi;
-        try {
-            pi = context.getPackageManager().getPackageInfo(context.getPackageName(),
-                    PackageManager.GET_PERMISSIONS);
-            if (pi != null) {
-                manifestPermissions = pi.requestedPermissions;
-            }
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
     public static HiPermission with(Activity act) {
         return new HiPermission(act);
     }
@@ -65,6 +49,20 @@ public class HiPermission {
 
     public static HiPermission with(android.app.Fragment fragment) {
         return new HiPermission(fragment.getActivity());
+    }
+
+    /**
+     * 功能描述：开启应用详情页
+     * @param context   上下文
+     */
+    public static void appDetail(Context context) {
+        Intent intent = new Intent();
+        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        Uri uri = Uri.fromParts("package", context.getPackageName(), null);
+        intent.setData(uri);
+        if (! (context instanceof Activity))
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
     }
 
     public static boolean checkSelf(@NonNull Context context,
@@ -94,7 +92,23 @@ public class HiPermission {
     private HiPermission(Activity act) {
         this.act = act;
         this.permissions = new ArrayList<>();
-        initPermissions(act);
+        initPermissions();
+    }
+
+    // 初始化Manifest中的权限
+    private void initPermissions() {
+        if (manifestPermissions != null)
+            return;
+        PackageInfo pi;
+        try {
+            pi = act.getPackageManager().getPackageInfo(act.getPackageName(),
+                    PackageManager.GET_PERMISSIONS);
+            if (pi != null) {
+                manifestPermissions = pi.requestedPermissions;
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     public HiPermission permission(@NonNull Permission permission) {
@@ -185,21 +199,6 @@ public class HiPermission {
         }
     }
 
-    void filterPermission() {
-        // 获取需要请求的有效的权限
-        for (int i = permissions.size() - 1; i >= 0; i--) {
-            Permission permission = permissions.get(i);
-            for (String p : manifestPermissions) {
-                if (permission.getGroup().contains(p)) {
-                    permission.setContent(p);
-                    break;
-                }
-            }
-            if (permission.getContent() == null)
-                permissions.remove(permission);
-        }
-    }
-
     void notifyHiPermission(int code, String[] permissions, int[] results) {
         if (Build.VERSION.SDK_INT < 23)
             return;
@@ -235,18 +234,19 @@ public class HiPermission {
         }
     }
 
-    /**
-     * 功能描述：开启应用详情页
-     * @param context   上下文
-     */
-    public static void appDetail(Context context) {
-        Intent intent = new Intent();
-        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-        Uri uri = Uri.fromParts("package", context.getPackageName(), null);
-        intent.setData(uri);
-        if (! (context instanceof Activity))
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(intent);
+    private void filterPermission() {
+        // 获取需要请求的有效的权限
+        for (int i = permissions.size() - 1; i >= 0; i--) {
+            Permission permission = permissions.get(i);
+            for (String p : manifestPermissions) {
+                if (permission.getGroup().contains(p)) {
+                    permission.setContent(p);
+                    break;
+                }
+            }
+            if (permission.getContent() == null)
+                permissions.remove(permission);
+        }
     }
 
     public interface OnGrantedListener {
