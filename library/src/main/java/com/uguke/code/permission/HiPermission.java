@@ -25,12 +25,12 @@ public class HiPermission {
     /** 多个权限请求 **/
     private static final int PERMISSION_MULTI = 1;
 
-    private Activity act;
+    /** Manifest文件申请的权限 **/
+    private static String [] manifestPermissions;
 
+    private Activity act;
     /** 权限列表 **/
     private List<Permission> permissions;
-    /** Manifest文件申请的权限 **/
-    private String [] manifestPermissions;
 
     /** 请求成功的权限回调 **/
     private OnGrantedListener grantedListener;
@@ -38,6 +38,22 @@ public class HiPermission {
     private OnDeniedListener deniedListener;
     /** 需要解释的权限回调 **/
     private OnRationaleListener rationaleListener;
+
+    // 初始化Manifest中的权限
+    private static void initPermissions(Context context) {
+        if (manifestPermissions != null)
+            return;
+        PackageInfo pi;
+        try {
+            pi = context.getPackageManager().getPackageInfo(context.getPackageName(),
+                    PackageManager.GET_PERMISSIONS);
+            if (pi != null) {
+                manifestPermissions = pi.requestedPermissions;
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static HiPermission with(Activity act) {
         return new HiPermission(act);
@@ -78,26 +94,13 @@ public class HiPermission {
     private HiPermission(Activity act) {
         this.act = act;
         this.permissions = new ArrayList<>();
-        initPermissions();
-    }
-
-    // 初始化Manifest中的权限
-    private void initPermissions() {
-        PackageInfo pi;
-        try {
-            pi = act.getPackageManager().getPackageInfo(act.getPackageName(),
-                    PackageManager.GET_PERMISSIONS);
-            if (pi != null) {
-                manifestPermissions = pi.requestedPermissions;
-            }
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
+        initPermissions(act);
     }
 
     public HiPermission permission(@NonNull Permission permission) {
         this.permissions.clear();
         permissions.add(permission);
+        filterPermission();
         return this;
     }
 
@@ -108,6 +111,7 @@ public class HiPermission {
                 this.permissions.add(permission);
             }
         }
+        filterPermission();
         return this;
     }
 
@@ -118,6 +122,7 @@ public class HiPermission {
                 this.permissions.add(permission);
             }
         }
+        filterPermission();
         return this;
     }
 
@@ -141,6 +146,8 @@ public class HiPermission {
     }
 
     public void request() {
+        if (checkSelf(act, permissions))
+            return;
         HiCache.getInstance().put(act.getClass().getName(), this);
         // 启动PermissionActivity
         Intent intent = new Intent(act, PermissionActivity.class);
@@ -155,18 +162,6 @@ public class HiPermission {
         if (Build.VERSION.SDK_INT < 23 ||
                 manifestPermissions == null)
             return;
-        // 获取需要请求的有效的权限
-        for (int i = permissions.size() - 1; i >= 0; i--) {
-            Permission permission = permissions.get(i);
-            for (String p : manifestPermissions) {
-                if (permission.getGroup().contains(p)) {
-                    permission.setContent(p);
-                    break;
-                }
-            }
-            if (permission.getContent() == null)
-                permissions.remove(permission);
-        }
 
         // 如果是请求单一权限
         if (permissions.size() == 1) {
@@ -187,6 +182,21 @@ public class HiPermission {
                 ActivityCompat.requestPermissions(act,
                         denied.toArray(new String[denied.size()]), PERMISSION_MULTI);
             }
+        }
+    }
+
+    void filterPermission() {
+        // 获取需要请求的有效的权限
+        for (int i = permissions.size() - 1; i >= 0; i--) {
+            Permission permission = permissions.get(i);
+            for (String p : manifestPermissions) {
+                if (permission.getGroup().contains(p)) {
+                    permission.setContent(p);
+                    break;
+                }
+            }
+            if (permission.getContent() == null)
+                permissions.remove(permission);
         }
     }
 
