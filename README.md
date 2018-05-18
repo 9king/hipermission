@@ -1,5 +1,21 @@
 # HiPermission
 权限管理
+## 导入
+1. 在build.gradle添加如下代码：<br>
+```
+allprojects {
+	repositories {
+		...
+		maven { url 'https://jitpack.io' }
+	}
+}
+```
+2. 添加依赖关系
+```
+dependencies {
+	compile 'com.github.uguker:HiPermission:1.2.4'
+}
+```
 # 使用方法
 ```
     @Override
