@@ -13,7 +13,7 @@ allprojects {
 2. 添加依赖关系
 ```
 dependencies {
-	implementation 'com.github.uguker:HiPermission:1.2.4'
+	implementation 'com.github.uguker:HiPermission:1.0.6'
 }
 ```
 # 使用方法
