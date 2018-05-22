@@ -4,7 +4,8 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.support.annotation.DrawableRes;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -99,57 +100,58 @@ public final class Permission {
      */
     @SuppressLint("InlinedApi")
     private static final class Group {
-        // 日历
-        static final List<String> CALENDAR =  new ArrayList<String>() {{
-            add(Manifest.permission.READ_CALENDAR);
-            add(Manifest.permission.WRITE_CALENDAR);
-        }};
+
         // 照相机
-        static final List<String> CAMERA = new ArrayList<String>() {{
-            add(Manifest.permission.CAMERA);
-        }};
-        // 联系人
-        static final List<String> CONTACTS = new ArrayList<String>() {{
-            add(Manifest.permission.WRITE_CONTACTS);
-            add(Manifest.permission.GET_ACCOUNTS);
-            add(Manifest.permission.READ_CONTACTS);
-        }};
-        // 位置
-        static final List<String> LOCATION = new ArrayList<String>() {{
-            add(Manifest.permission.ACCESS_FINE_LOCATION);
-            add(Manifest.permission.ACCESS_COARSE_LOCATION);
-        }};
-        // 麦克风
-        static final List<String> MICROPHONE = new ArrayList<String>() {{
-            add(Manifest.permission.RECORD_AUDIO);
-        }};
-        // 手机
-        static final List<String> PHONE = new ArrayList<String>() {{
-            add(Manifest.permission.READ_CALL_LOG);
-            add(Manifest.permission.READ_PHONE_STATE);
-            add(Manifest.permission.CALL_PHONE);
-            add(Manifest.permission.WRITE_CALL_LOG);
-            add(Manifest.permission.USE_SIP);
-            add(Manifest.permission.PROCESS_OUTGOING_CALLS);
-            add(Manifest.permission.ADD_VOICEMAIL);
-        }};
+        static final List<String> CAMERA = Collections.singletonList(
+                Manifest.permission.CAMERA
+        );
         // 传感器
-        static final List<String> SENSORS = new ArrayList<String>() {{
-            add(Manifest.permission.BODY_SENSORS);
-        }};
+        static final List<String> SENSORS = Collections.singletonList(
+                Manifest.permission.BODY_SENSORS
+        );
+        // 麦克风
+        static final List<String> MICROPHONE = Collections.singletonList(
+                Manifest.permission.RECORD_AUDIO
+        );
+        // 日历
+        static final List<String> CALENDAR = Arrays.asList(
+                Manifest.permission.READ_CALENDAR,
+                Manifest.permission.WRITE_CALENDAR
+        );
+        // 联系人
+        static final List<String> CONTACTS = Arrays.asList(
+                Manifest.permission.GET_ACCOUNTS,
+                Manifest.permission.READ_CONTACTS,
+                Manifest.permission.WRITE_CONTACTS
+        );
+        // 位置
+        static final List<String> LOCATION = Arrays.asList(
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION
+        );
+        // 手机
+        static final List<String> PHONE = Arrays.asList(
+                Manifest.permission.ADD_VOICEMAIL,
+                Manifest.permission.CALL_PHONE,
+                Manifest.permission.PROCESS_OUTGOING_CALLS,
+                Manifest.permission.READ_CALL_LOG,
+                Manifest.permission.READ_PHONE_STATE,
+                Manifest.permission.WRITE_CALL_LOG,
+                Manifest.permission.USE_SIP
+        );
         // 短信
-        static final List<String> SMS = new ArrayList<String>() {{
-            add(Manifest.permission.READ_SMS);
-            add(Manifest.permission.RECEIVE_WAP_PUSH);
-            add(Manifest.permission.RECEIVE_MMS);
-            add(Manifest.permission.RECEIVE_SMS);
-            add(Manifest.permission.SEND_SMS);
-        }};
+        static final List<String> SMS = Arrays.asList(
+                Manifest.permission.READ_SMS,
+                Manifest.permission.RECEIVE_WAP_PUSH,
+                Manifest.permission.RECEIVE_MMS,
+                Manifest.permission.RECEIVE_SMS,
+                Manifest.permission.SEND_SMS
+        );
         // 存储
-        static final List<String> STORAGE = new ArrayList<String>() {{
-            add(Manifest.permission.READ_EXTERNAL_STORAGE);
-            add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        }};
+        static final List<String> STORAGE = Arrays.asList(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+        );
     }
 
 }

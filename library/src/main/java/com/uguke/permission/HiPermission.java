@@ -55,7 +55,7 @@ public class HiPermission {
      * 功能描述：开启应用详情页
      * @param context   上下文
      */
-    public static void appDetail(Context context) {
+    public static void openAppDetail(Context context) {
         Intent intent = new Intent();
         intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
         Uri uri = Uri.fromParts("package", context.getPackageName(), null);
@@ -66,13 +66,21 @@ public class HiPermission {
     }
 
     public static boolean checkSelf(@NonNull Context context,
-                                    @NonNull Permission permission) {
+                                    @NonNull final Permission permission) {
+        initPermissions(context);
+        // 筛选有效权限
+        filterPermission(new ArrayList<Permission>() {
+            {
+                add(permission);
+            }
+        });
         return Build.VERSION.SDK_INT < 23 || ActivityCompat.checkSelfPermission(context,
                 permission.getContent()) == PackageManager.PERMISSION_GRANTED;
     }
 
     public static boolean checkSelf(@NonNull Context context,
                                     @NonNull List<Permission> permissions) {
+        initPermissions(context);
         for (Permission permission : permissions) {
             if (!checkSelf(context, permission))
                 return false;
@@ -82,6 +90,7 @@ public class HiPermission {
 
     public static boolean checkSelf(@NonNull Context context,
                                     @NonNull Permission... permissions) {
+        initPermissions(context);
         for (Permission permission : permissions) {
             if (!checkSelf(context, permission))
                 return false;
@@ -89,19 +98,13 @@ public class HiPermission {
         return true;
     }
 
-    private HiPermission(Activity act) {
-        this.act = act;
-        this.permissions = new ArrayList<>();
-        initPermissions();
-    }
-
     // 初始化Manifest中的权限
-    private void initPermissions() {
+    private static void initPermissions(Context context) {
         if (manifestPermissions != null)
             return;
         PackageInfo pi;
         try {
-            pi = act.getPackageManager().getPackageInfo(act.getPackageName(),
+            pi = context.getPackageManager().getPackageInfo(context.getPackageName(),
                     PackageManager.GET_PERMISSIONS);
             if (pi != null) {
                 manifestPermissions = pi.requestedPermissions;
@@ -111,10 +114,31 @@ public class HiPermission {
         }
     }
 
+    private static void filterPermission(List<Permission> permissions) {
+        // 获取需要请求的有效的权限
+        for (int i = permissions.size() - 1; i >= 0; i--) {
+            Permission permission = permissions.get(i);
+            for (String p : manifestPermissions) {
+                if (permission.getGroup().contains(p)) {
+                    permission.setContent(p);
+                    break;
+                }
+            }
+            if (permission.getContent() == null)
+                permissions.remove(permission);
+        }
+    }
+
+    private HiPermission(Activity act) {
+        this.act = act;
+        this.permissions = new ArrayList<>();
+        initPermissions(act);
+    }
+
     public HiPermission permission(@NonNull Permission permission) {
         this.permissions.clear();
         permissions.add(permission);
-        filterPermission();
+        filterPermission(this.permissions);
         return this;
     }
 
@@ -125,7 +149,7 @@ public class HiPermission {
                 this.permissions.add(permission);
             }
         }
-        filterPermission();
+        filterPermission(this.permissions);
         return this;
     }
 
@@ -136,7 +160,7 @@ public class HiPermission {
                 this.permissions.add(permission);
             }
         }
-        filterPermission();
+        filterPermission(this.permissions);
         return this;
     }
 
@@ -231,21 +255,6 @@ public class HiPermission {
             // 需要解释的权限回调
             if (ration.size() > 0 && rationaleListener != null)
                 rationaleListener.onRationale(ration);
-        }
-    }
-
-    private void filterPermission() {
-        // 获取需要请求的有效的权限
-        for (int i = permissions.size() - 1; i >= 0; i--) {
-            Permission permission = permissions.get(i);
-            for (String p : manifestPermissions) {
-                if (permission.getGroup().contains(p)) {
-                    permission.setContent(p);
-                    break;
-                }
-            }
-            if (permission.getContent() == null)
-                permissions.remove(permission);
         }
     }
 
