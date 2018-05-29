@@ -4,6 +4,6 @@
     <application>
         <activity
             android:name=".PermissionActivity"
-            android:theme="@android:style/Theme.Holo.Dialog.NoActionBar" />
+            android:theme="@style/PermissionTheme" />
     </application>
 </manifest>
